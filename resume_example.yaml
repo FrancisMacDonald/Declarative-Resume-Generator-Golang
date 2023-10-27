@@ -1,0 +1,43 @@
+name: John Doe
+email: johndoe@email.com
+phone: 555-555-5555
+address:
+    street: 123 Main St
+    city: Anytown
+    state: CA
+    zip: 12345
+summary: |
+    A highly motivated and detail-oriented software engineer with 15 years of experience in full-stack web development. Skilled in JavaScript, React, Node.js, and SQL. Passionate about creating clean, efficient, and scalable code.
+experience:
+    - company: Acme Inc.
+      position: Full-Stack Developer
+      start_date: 01/2018
+      end_date: 06/2021
+      highlights:
+        - Developed and maintained multiple web applications using React, Node.js, and SQL.
+        - Collaborated with cross-functional teams to design and implement new features.
+        - Improved application performance by optimizing database queries and reducing page load times.
+    - company: XYZ Corp.
+      position: Front-End Developer
+      start_date: 06/2016
+      end_date: 12/2017
+      highlights:
+        - Built and maintained the company's e-commerce website using React and Redux.
+        - Worked closely with the design team to ensure a seamless user experience.
+        - Implemented A/B testing to improve conversion rates.
+education:
+    - institution: University of California, Berkeley
+      degree: Bachelor of Science in Computer Science
+      start_date: 09/2012
+      end_date: 05/2016
+skills:
+    - JavaScript
+    - React
+    - Node.js
+    - SQL
+    - Git
+certifications:
+    - name: AWS Certified Solutions Architect - Associate
+      date: 01/2021
+    - name: AWS Certified Developer - Associate
+      date: 01/2021
