@@ -20,6 +20,15 @@ func main() {
 	}
 }
 
+func scanResume(path string) Resume {
+	resume := parseResumeFromYaml(path)
+	experience := resume.Experience
+
+	for i := 0; i < len(experience); i++ {
+		experience[i].Highlights = scanHighlights(experience[i].Highlights)
+	}
+}
+
 func writeResumeToYaml(resume Resume, path string) {
 	filename, _ := filepath.Abs(path)
 	yamlContents, err := yaml.Marshal(resume)
