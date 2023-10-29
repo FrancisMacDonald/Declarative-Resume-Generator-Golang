@@ -2,15 +2,22 @@ package main
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"os"
-	"path/filepath"
 )
 
+type CorrectedText struct {
+	Title     string
+	Original  string
+	Corrected string
+}
+
 func main() {
-	resume := parseResumeFromYaml("resume_example.yaml")
-	fmt.Println(resume)
-	writeResumeToYaml(resume, "resume_example_output.yaml")
+	openAiToken := os.Getenv("OPENAI_TOKEN")
+
+	openAiProvider := OpenAiProvider{}
+	openAiProvider.Initialize(openAiToken)
+
+	processResume(YamlResumeParser{}, openAiProvider)
 
 	// delete file
 	err := os.Remove("resume_example_output.yaml")
@@ -20,50 +27,28 @@ func main() {
 	}
 }
 
-func scanResume(path string) Resume {
-	resume := parseResumeFromYaml(path)
-	experience := resume.Experience
+func processResume(parser ResumeParser, aiProvider AiProvider) {
+	resume := parser.Parse("resume_example.yaml")
+	fmt.Println(resume)
 
-	for i := 0; i < len(experience); i++ {
-		experience[i].Highlights = scanHighlights(experience[i].Highlights)
-	}
+	checkGrammarAndSpelling(aiProvider, resume)
+
+	parser.Write(resume, "resume_example_output.yaml")
 }
 
-func writeResumeToYaml(resume Resume, path string) {
-	filename, _ := filepath.Abs(path)
-	yamlContents, err := yaml.Marshal(resume)
+func checkGrammarAndSpelling(aiProvider AiProvider, resume Resume) {
+	correctedSummary := aiProvider.CheckSpellingGrammar(resume.Summary)
+	correctedSummary.Title = "Summary"
 
-	if err != nil {
-		fmt.Printf("Error marshalling YAML: %v\n", err)
-		return
+	var correctedHighlights []CorrectedText
+
+	// Correct spelling and grammar on all experience highlights
+	for _, experience := range resume.Experience {
+		for _, highlight := range experience.Highlights {
+			correctedHighlight := aiProvider.CheckSpellingGrammar(highlight)
+			correctedHighlight.Title = experience.Company + " - " + experience.Position
+			correctedHighlights = append(correctedHighlights, correctedHighlight)
+		}
 	}
 
-	err = os.WriteFile(filename, yamlContents, 0644)
-
-	if err != nil {
-		fmt.Printf("Error writing file: %v\n", err)
-		return
-	}
-}
-
-func parseResumeFromYaml(path string) Resume {
-	filename, _ := filepath.Abs(path)
-	yamlContents, err := os.ReadFile(filename)
-
-	if err != nil {
-		fmt.Printf("Error reading file:%v\n ", err)
-
-		return Resume{}
-	}
-
-	resume := Resume{}
-	err = yaml.Unmarshal(yamlContents, &resume)
-
-	if err != nil {
-		fmt.Printf("Error parsing YAML: %v\n", err)
-
-		return Resume{}
-	}
-
-	return resume
 }
