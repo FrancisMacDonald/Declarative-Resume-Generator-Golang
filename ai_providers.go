@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/sashabaranov/go-openai"
+	"strings"
 )
 
 type AiProvider interface {
@@ -29,6 +30,17 @@ func (provider OpenAiProvider) Initialize(token string) {
 }
 
 func (provider OpenAiProvider) CheckSpellingGrammar(text string) CorrectedText {
+	// TODO: Allow individual corrections.
+	// TODO: Return a reason for the corrections.
+
+	if strings.TrimSpace(text) == "" {
+		return CorrectedText{
+			Original:  text,
+			Corrected: text,
+			Changes:   "",
+		}
+	}
+
 	resp, err := provider.client.CreateCompletion(
 		context.Background(),
 		openai.CompletionRequest{
@@ -52,8 +64,12 @@ func (provider OpenAiProvider) CheckSpellingGrammar(text string) CorrectedText {
 
 	fmt.Println(resp.Choices[0].Text)
 
+	correctedText := resp.Choices[0].Text
+	correctedChanges := "" // TODO: add reason for corrections
+
 	return CorrectedText{
 		Original:  text,
-		Corrected: resp.Choices[0].Text,
+		Corrected: correctedText,
+		Changes:   correctedChanges,
 	}
 }
