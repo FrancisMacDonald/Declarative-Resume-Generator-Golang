@@ -36,6 +36,7 @@ func main() {
     err = os.Remove("resume_example_output.yaml")
 
     if err != nil {
+        fmt.Printf("Error deleting file:%v\n ", err)
         return
     }
 }
@@ -58,10 +59,12 @@ func processResume(parser ResumeParser, aiProvider AiProvider, path string, auto
     // Correct experience highlights
     for _, experience := range resume.Experience {
         for _, highlight := range experience.Highlights {
+            fmt.Printf("Checking highlight: %v\n", highlight)
             correctedHighlight := aiProvider.CheckSpellingGrammar(highlight)
 
             if correctedHighlight.Corrected == highlight {
                 // No need to log corrected if it's already correct
+                break // TODO: REMOVE THIS ONCE WE HAVE RATE LIMITING
                 continue
             }
 
@@ -71,7 +74,10 @@ func processResume(parser ResumeParser, aiProvider AiProvider, path string, auto
             if autoCorrect {
                 highlight = correctedHighlight.Corrected
             }
+
+            break // TODO: REMOVE THIS ONCE WE HAVE RATE LIMITING
         }
+        break // TODO: REMOVE THIS ONCE WE HAVE RATE LIMITING
     }
 
     outputPath := path + "_output.yaml"
