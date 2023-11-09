@@ -15,7 +15,7 @@ type CorrectedText struct {
 func main() {
     autoCorrect := true
     openAiToken := os.Getenv("OPENAI_TOKEN")
-    openAiProvider := OpenAiProvider{}
+    var openAiProvider = &OpenAiProvider{}
 
     initialPrompt := "You are a helpful AI assistant that helps people write resumes. Resume:" // TODO: Fix
     openAiProvider.Initialize(openAiToken, initialPrompt, nil)

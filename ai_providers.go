@@ -19,7 +19,7 @@ type OpenAiProvider struct {
     initialPrompt string // You are a helpful blah blah blah
 }
 
-func (provider OpenAiProvider) Initialize(token string, initialPrompt string, seed *int) {
+func (provider *OpenAiProvider) Initialize(token string, initialPrompt string, seed *int) {
     client := openai.NewClient(token)
 
     // test connection
@@ -27,12 +27,14 @@ func (provider OpenAiProvider) Initialize(token string, initialPrompt string, se
 
     if err != nil {
         fmt.Printf("Error listing engines: %v\n", err)
+        panic(err)
     }
 
     provider.client = client
+
 }
 
-func (provider OpenAiProvider) CheckSpellingGrammar(text string) CorrectedText {
+func (provider *OpenAiProvider) CheckSpellingGrammar(text string) CorrectedText {
     // TODO: Allow individual corrections.
     // TODO: Return a reason for the corrections.
 
@@ -44,19 +46,20 @@ func (provider OpenAiProvider) CheckSpellingGrammar(text string) CorrectedText {
         }
     }
 
+    messages := []openai.ChatCompletionMessage{
+        {
+            Role:    openai.ChatMessageRoleSystem,
+            Content: provider.initialPrompt,
+        },
+        {
+            Role:    openai.ChatMessageRoleUser,
+            Content: text,
+        },
+    }
     chatCompletionRequest := openai.ChatCompletionRequest{
         Model:       openai.GPT3Dot5Turbo,
         Temperature: math.SmallestNonzeroFloat32, // Testing if this helps to make it deterministic.
-        Messages: []openai.ChatCompletionMessage{
-            {
-                Role:    openai.ChatMessageRoleSystem,
-                Content: provider.initialPrompt,
-            },
-            {
-                Role:    openai.ChatMessageRoleUser,
-                Content: text,
-            },
-        },
+        Messages:    messages,
     }
 
     // If there is a seed on the provider, use it.
