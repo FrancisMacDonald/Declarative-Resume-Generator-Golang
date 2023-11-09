@@ -19,7 +19,7 @@ type OpenAiProvider struct {
     initialPrompt string // You are a helpful blah blah blah
 }
 
-func (provider OpenAiProvider) Initialize(token string) {
+func (provider OpenAiProvider) Initialize(token string, initialPrompt string, seed *int) {
     client := openai.NewClient(token)
 
     // test connection

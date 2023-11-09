@@ -17,7 +17,8 @@ func main() {
     openAiToken := os.Getenv("OPENAI_TOKEN")
     openAiProvider := OpenAiProvider{}
 
-    openAiProvider.Initialize(openAiToken)
+    initialPrompt := "You are a helpful AI assistant that helps people write resumes. Resume:" // TODO: Fix
+    openAiProvider.Initialize(openAiToken, initialPrompt, nil)
 
     processResume(YamlResumeParser{}, openAiProvider, "resume_example.yaml", autoCorrect)
 
