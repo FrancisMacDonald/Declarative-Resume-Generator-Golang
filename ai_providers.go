@@ -57,7 +57,7 @@ func (provider *OpenAiProvider) CheckSpellingGrammar(text string) CorrectedText 
         },
     }
     chatCompletionRequest := openai.ChatCompletionRequest{
-        Model:       openai.GPT3Dot5Turbo,
+        Model:       openai.GPT4,
         Temperature: math.SmallestNonzeroFloat32, // Testing if this helps to make it deterministic.
         Messages:    messages,
     }
@@ -90,8 +90,6 @@ func (provider *OpenAiProvider) CheckSpellingGrammar(text string) CorrectedText 
 
     messageContent := resp.Choices[0].Message.Content
     // systemFingerprint := resp.SystemFingerprint // Not implemented in the library yet.
-    fmt.Println(messageContent)
-
     correctedText := messageContent
     correctedChanges := "" // TODO: add reason for corrections
 

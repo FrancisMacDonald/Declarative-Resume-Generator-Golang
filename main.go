@@ -3,6 +3,7 @@ package main
 import (
     "fmt"
     "os"
+    "strings"
 )
 
 type CorrectedText struct {
@@ -20,10 +21,15 @@ func main() {
     initialPrompt := "You are a helpful AI assistant that helps people write resumes. Resume:" // TODO: Fix
     openAiProvider.Initialize(openAiToken, initialPrompt, nil)
 
-    processResume(YamlResumeParser{}, openAiProvider, "resume_example.yaml", autoCorrect)
+    inputFileName := "resume_example.yaml"
+    resumeUpdated := processResume(YamlResumeParser{}, openAiProvider, inputFileName, autoCorrect)
+
+    outputFileName := strings.Split(inputFileName, ".")[0] + "_output.yaml"
+
+    YamlResumeParser{}.Write(resumeUpdated, outputFileName)
 
     // temp
-    file, err := os.ReadFile("resume_example_output.yaml")
+    file, err := os.ReadFile(outputFileName)
 
     if err != nil {
         fmt.Printf("Error reading file:%v\n ", err)
@@ -33,7 +39,7 @@ func main() {
     fmt.Println(string(file))
 
     // delete file
-    err = os.Remove("resume_example_output.yaml")
+    err = os.Remove(outputFileName)
 
     if err != nil {
         fmt.Printf("Error deleting file:%v\n ", err)
@@ -42,9 +48,8 @@ func main() {
 }
 
 // TODO: refactor
-func processResume(parser ResumeParser, aiProvider AiProvider, path string, autoCorrect bool) {
+func processResume(parser ResumeParser, aiProvider AiProvider, path string, autoCorrect bool) Resume {
     resume := parser.Parse(path)
-    fmt.Println(resume)
 
     // Correct summary
     correctedSummary := aiProvider.CheckSpellingGrammar(resume.Summary)
@@ -80,6 +85,5 @@ func processResume(parser ResumeParser, aiProvider AiProvider, path string, auto
         break // TODO: REMOVE THIS ONCE WE HAVE RATE LIMITING
     }
 
-    outputPath := path + "_output.yaml"
-    parser.Write(resume, outputPath)
+    return resume
 }
